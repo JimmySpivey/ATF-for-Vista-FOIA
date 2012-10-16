@@ -1,0 +1,15 @@
+OSEHRA Automated Testing
+
+This project provides tools to perform automatic testing of a VistA
+instance running under a GT.M or InterSystems Cache environment.
+
+Please visit http://osehra.org for more information.
+
+
+
+---------------------
+Branch created for the RASR.
+Created on 10/16/12.
+From: https://github.com/OSEHRA/OSEHRA-Automated-Testing
+HEAD, Commit: 19492ed22dcc73db54cb678467eecbe3b71eadcc
+Commit 19492ed22dcc73db54cb678467eecbe3b71eadcc date: 10/10/12
