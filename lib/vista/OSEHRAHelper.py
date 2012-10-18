@@ -307,9 +307,9 @@ class ConnectRemoteSSH(ConnectMUMPS):
     self.connection.send(command + '\r')
 
   def wait(self, command, tout=15):
+    time.sleep(.01)
     logging.debug('connection.expect: ' + str(command))
 
-    time.sleep(.01)
     if command is PROMPT:
       command = self.namespace + '>'
     else:
@@ -412,7 +412,7 @@ class ConnectRemoteSSH(ConnectMUMPS):
         escaped_str += c
     return escaped_str
 
-def ConnectToMUMPS(logfile, instance='CACHE', namespace='VISTA', location='127.0.0.1', remote_conn_details=None):
+def ConnectToMUMPS(logfile, instance, namespace='', location='127.0.0.1', remote_conn_details=None):
 
     #self.namespace = namespace
     #self.location = location

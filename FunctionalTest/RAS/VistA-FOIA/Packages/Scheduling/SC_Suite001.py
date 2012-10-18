@@ -7,17 +7,16 @@ import sys
 sys.path = ['./FunctionalTest/RAS/lib'] + ['./dataFiles'] + ['./lib/vista'] + sys.path
 from SCActions import SCActions
 import TestHelper
-import datetime
-import logging
 
 def sc_test001(resultlog, result_dir):
     '''Basic appointment managment options
     Make an Appointment, Check in, Check Out'''
     testname = sys._getframe().f_code.co_name
-    resultlog.write('\n' + testname + ', ' + str(datetime.datetime.today()) + ': ')
-    logging.debug('\n' + testname + ', ' + str(datetime.datetime.today()) + ': ')
+    test_driver = TestHelper.TestDriver(testname)
+
+    test_driver.pre_test_run(test_suite_details)
     try:
-        VistA = connect_VistA(testname, result_dir)
+        VistA = test_driver.connect_VistA(test_suite_details)
         SC = SCActions(VistA, scheduling='Scheduling')
         time = SC.schtime()
         SC.signon()
@@ -30,21 +29,25 @@ def sc_test001(resultlog, result_dir):
         SC.signon()
         SC.checkout(vlist1=['Three', str(hour), 'Checked In'], vlist2=['305.91', 'OTHER DRUG', 'RESULTING'], icd='305.91')
         SC.signoff()
+        test_driver.post_test_run(test_suite_details)
     except TestHelper.TestError, e:
-        resultlog.write('\nEXCEPTION ERROR:' + str(e))
-        logging.error('*****exception*********' + str(e))
+        test_driver.exception_handling(e)
     else:
-        resultlog.write('Pass\n')
+        test_driver.try_else_handling(test_suite_details)
+    finally:
+        test_driver.finally_handling(test_suite_details)
+    test_driver.end_method_handling(test_suite_details)
 
 def sc_test002(resultlog, result_dir):
     '''Basic appointment managment options
     Make an Appointment (Scheduled and Unscheduled),
     record a No-Show, Cancel an appointment and change patients'''
     testname = sys._getframe().f_code.co_name
-    resultlog.write('\n' + testname + ', ' + str(datetime.datetime.today()) + ': ')
-    logging.debug('\n' + testname + ', ' + str(datetime.datetime.today()) + ': ')
+    test_driver = TestHelper.TestDriver(testname)
+
+    test_driver.pre_test_run(test_suite_details)
     try:
-        VistA = connect_VistA(testname, result_dir)
+        VistA = test_driver.connect_VistA(test_suite_details)
         SC = SCActions(VistA, scheduling='Scheduling')
         time = SC.schtime()
         SC.signon()
@@ -59,20 +62,24 @@ def sc_test002(resultlog, result_dir):
         SC.signon()
         SC.chgpatient(patient1='345678233', patient2='345238901', patientname1='Twelve', patientname2='Ten')
         SC.signoff()
+        test_driver.post_test_run(test_suite_details)
     except TestHelper.TestError, e:
-        resultlog.write('\nEXCEPTION ERROR:' + str(e))
-        logging.error('*****exception*********' + str(e))
+        test_driver.exception_handling(e)
     else:
-        resultlog.write('Pass\n')
+        test_driver.try_else_handling(test_suite_details)
+    finally:
+        test_driver.finally_handling(test_suite_details)
+    test_driver.end_method_handling(test_suite_details)
 
 def sc_test003(resultlog, result_dir):
     '''This tests clinic features such as change clinic, change daterange,
      expand the entry, add and edit, and Patient demographics'''
     testname = sys._getframe().f_code.co_name
-    resultlog.write('\n' + testname + ', ' + str(datetime.datetime.today()) + ': ')
-    logging.debug('\n' + testname + ', ' + str(datetime.datetime.today()) + ': ')
+    test_driver = TestHelper.TestDriver(testname)
+
+    test_driver.pre_test_run(test_suite_details)
     try:
-        VistA = connect_VistA(testname, result_dir)
+        VistA = test_driver.connect_VistA(test_suite_details)
         SC = SCActions(VistA, scheduling='Scheduling')
         SC.signon()
         SC.chgclinic()
@@ -81,19 +88,23 @@ def sc_test003(resultlog, result_dir):
         SC.signon()
         SC.teaminfo()
         SC.signoff()
+        test_driver.post_test_run(test_suite_details)
     except TestHelper.TestError, e:
-        resultlog.write('\nEXCEPTION ERROR:' + str(e))
-        logging.error('*****exception*********' + str(e))
+        test_driver.exception_handling(e)
     else:
-        resultlog.write('Pass\n')
+        test_driver.try_else_handling(test_suite_details)
+    finally:
+        test_driver.finally_handling(test_suite_details)
+    test_driver.end_method_handling(test_suite_details)
 
 def sc_test004(resultlog, result_dir):
     '''This tests clinic features such as expand the entry, add and edit, and Patient demographics'''
     testname = sys._getframe().f_code.co_name
-    resultlog.write('\n' + testname + ', ' + str(datetime.datetime.today()) + ': ')
-    logging.debug('\n' + testname + ', ' + str(datetime.datetime.today()) + ': ')
+    test_driver = TestHelper.TestDriver(testname)
+
+    test_driver.pre_test_run(test_suite_details)
     try:
-        VistA = connect_VistA(testname, result_dir)
+        VistA = test_driver.connect_VistA(test_suite_details)
         SC = SCActions(VistA, scheduling='Scheduling')
         time = SC.schtime(plushour=1)
         SC.signon()
@@ -107,19 +118,23 @@ def sc_test004(resultlog, result_dir):
         SC.signon()
         SC.addedit(name='345623902', icd='305.91')
         SC.signoff()
+        test_driver.post_test_run(test_suite_details)
     except TestHelper.TestError, e:
-        resultlog.write('\nEXCEPTION ERROR:' + str(e))
-        logging.error('*****exception*********' + str(e))
+        test_driver.exception_handling(e)
     else:
-        resultlog.write('Pass\n')
+        test_driver.try_else_handling(test_suite_details)
+    finally:
+        test_driver.finally_handling(test_suite_details)
+    test_driver.end_method_handling(test_suite_details)
 
 def sc_test005(resultlog, result_dir):
     '''This test checks a patient into a clinic, then discharges him, then deletes his checkout'''
     testname = sys._getframe().f_code.co_name
-    resultlog.write('\n' + testname + ', ' + str(datetime.datetime.today()) + ': ')
-    logging.debug('\n' + testname + ', ' + str(datetime.datetime.today()) + ': ')
+    test_driver = TestHelper.TestDriver(testname)
+
+    test_driver.pre_test_run(test_suite_details)
     try:
-        VistA = connect_VistA(testname, result_dir)
+        VistA = test_driver.connect_VistA(test_suite_details)
         SC = SCActions(VistA)
         SC.signon()
         SC.enroll(patient='543236666')
@@ -135,69 +150,86 @@ def sc_test005(resultlog, result_dir):
         SC.signon()
         SC.deletecheckout(appnum='3')
         SC.signoff()
+        test_driver.post_test_run(test_suite_details)
     except TestHelper.TestError, e:
-        resultlog.write('\nEXCEPTION ERROR:' + str(e))
-        logging.error('*****exception*********' + str(e))
+        test_driver.exception_handling(e)
     else:
-        resultlog.write('Pass\n')
+        test_driver.try_else_handling(test_suite_details)
+    finally:
+        test_driver.finally_handling(test_suite_details)
+    test_driver.end_method_handling(test_suite_details)
 
 def sc_test006(resultlog, result_dir):
     '''This test will exercise the wait list functionality'''
     testname = sys._getframe().f_code.co_name
-    resultlog.write('\n' + testname + ', ' + str(datetime.datetime.today()) + ': ')
-    logging.debug('\n' + testname + ', ' + str(datetime.datetime.today()) + ': ')
+    test_driver = TestHelper.TestDriver(testname)
+
+    test_driver.pre_test_run(test_suite_details)
     try:
-        VistA = connect_VistA(testname, result_dir)
+        VistA = test_driver.connect_VistA(test_suite_details)
         SC = SCActions(VistA, user='fakedoc1', code='1Doc!@#$')
         SC.signon()
         SC.waitlistentry(patient='323554545')
         SC.waitlistdisposition(patient='323554545')
         SC.signoff()
+        test_driver.post_test_run(test_suite_details)
     except TestHelper.TestError, e:
-        resultlog.write('\nEXCEPTION ERROR:' + str(e))
-        logging.error('*****exception*********' + str(e))
+        test_driver.exception_handling(e)
     else:
-        resultlog.write('Pass\n')
+        test_driver.try_else_handling(test_suite_details)
+    finally:
+        test_driver.finally_handling(test_suite_details)
+    test_driver.end_method_handling(test_suite_details)
 
 def startmon(resultlog, result_dir):
     '''Starts Coverage Monitor'''
-    testname=sys._getframe().f_code.co_name
-    resultlog.write('\n' + testname + ', '
-                    + str(datetime.datetime.today()) + ': ')
-    logging.debug('\n' + testname + ', ' + str(datetime.datetime.today()) + ': ')
+    testname = sys._getframe().f_code.co_name
+    test_driver = TestHelper.TestDriver(testname)
+
+    test_driver.pre_test_run(test_suite_details)
     try:
-        VistA1=connect_VistA(testname, result_dir)
+        VistA1 = test_driver.connect_VistA(test_suite_details)
         VistA1.startCoverage(routines=['SC*', 'SD*'])
-    except TestHelper.TestError, e:
-        resultlog.write(e.value)
-        logging.error(testname+ ' EXCEPTION ERROR: Unexpected test result')
-    finally:
+        test_driver.post_test_run(test_suite_details)
         '''
         Close Vista
         '''
         VistA1.write('^\r^\r^\r')
         VistA1.write('h\r')
+    except TestHelper.TestError, e:
+        test_driver.exception_handling(e)
+    else:
+        test_driver.try_else_handling(test_suite_details)
+    finally:
+        test_driver.finally_handling(test_suite_details)
+    test_driver.end_method_handling(test_suite_details)
 
 def stopmon (resultlog, result_dir):
     ''' STOP MONITOR'''
     testname = sys._getframe().f_code.co_name
-    resultlog.write('\n' + testname + ', '
-                    + str(datetime.datetime.today()) + ': ')
-    logging.debug('\n' + testname + ', ' + str(datetime.datetime.today()) + ': ')
+    test_driver = TestHelper.TestDriver(testname)
+
+    test_driver.pre_test_run(test_suite_details)
     try:
         # Connect to VistA
-        VistA1=connect_VistA(testname, result_dir)
+        VistA1 = test_driver.connect_VistA(test_suite_details)
         VistA1.stopCoverage(path=(result_dir + '/' + 'Scheduling_coverage.txt'))
-    except TestHelper.TestError, e:
-        resultlog.write(e.value)
-        logging.error(testname + ' EXCEPTION ERROR: Unexpected test result')
-    finally:
+        test_driver.post_test_run(test_suite_details)
         '''
         Close Vista
         '''
         VistA1.write('^\r^\r^\r')
         VistA1.write('h\r')
+    except TestHelper.TestError, e:
+        test_driver.exception_handling(e)
+    else:
+        test_driver.try_else_handling(test_suite_details)
+    finally:
+        test_driver.finally_handling(test_suite_details)
+    test_driver.end_method_handling(test_suite_details)
 
+
+'''
 def connect_VistA(testname, result_dir):
     # Connect to VistA
     from OSEHRAHelper import ConnectToMUMPS, PROMPT
@@ -209,3 +241,4 @@ def connect_VistA(testname, result_dir):
             pass
     VistA.wait(PROMPT)
     return VistA
+'''

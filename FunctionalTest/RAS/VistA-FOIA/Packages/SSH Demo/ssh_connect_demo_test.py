@@ -5,13 +5,13 @@ Simple demo which will connect via ssh to vista.vainnovation.us
 '''
 import os
 import sys
-#sys.path = ['./Scripts'] + ['./dataFiles'] + ['./helpers'] + sys.path
-sys.path = ['./'] + ['../lib/vista'] + sys.path
+#apparently these are not needed... at least not on windows. Will need to retest this on linux
+#sys.path = ['./FunctionalTest/RAS/lib'] + ['./lib/vista'] + sys.path
+#sys.path = ['./'] + ['../lib/vista'] + sys.path
 
 import RC_Suite001
 import TestHelper
 
-#TODO: move more code into reusable TestDriver class
 def main():
     test_suite_name = os.path.basename(__file__).split('.')[0]
     test_suite_driver = TestHelper.TestSuiteDriver()

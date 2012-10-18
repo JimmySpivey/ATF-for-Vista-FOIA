@@ -72,12 +72,14 @@ class TestSuiteDriver(object):
         parser.add_argument('-l', '--logging-level', help='Logging level', required=True)
         parser.add_argument('-f', '--logging-file', help='Logging file name')
         #TODO: edit ctest to refer to these parms below
-        parser.add_argument('-i', '--instance', help='cache instance type', choices=["CACHE", "GTM"], default='')
+        parser.add_argument('-i', '--instance', help='cache instance type', choices=["TRYCACHE", "GTM"], default='')
         parser.add_argument('-n', '--namespace', help='cache namespace', default='')
         args = parser.parse_args()
 
         logging_level = LOGGING_LEVELS.get(args.logging_level, logging.NOTSET)
         logging.basicConfig(level=logging_level, filename=args.logging_file, format='%(asctime)s %(levelname)s: %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+
+
 
         if args.remote_server and args.remote_server.__len__() != 1:
             remote_server = args.remote_server[1:] #remove first char, workaround for ctest
@@ -86,18 +88,22 @@ class TestSuiteDriver(object):
         else:
             remote_server = None
 
+        if args.instance == 'TRYCACHE' or args.instance == 'CACHE':
+            instance = 'cache'
+
         logging.info('RESULT DIR: ' + str(args.resultdir))
         logging.info('LOGGING FILE: ' + str(args.logging_file))
         logging.info('LOGGING LEVEL:   ' + str(args.logging_level))
         logging.info('REMOTE SERVER: ' + remote_server)
-        logging.info('INSTANCE: ' + str(args.instance))
+        logging.info('INSTANCE: ' + instance)
         logging.info('NAMESPACE: ' + str(args.namespace))
 
-        try:
-            os.makedirs(args.resultdir)
-        except OSError, e:
-            if e.errno != errno.EEXIST:
-                raise
+        if not os.path.isdir(args.resultdir):
+            try:
+                os.makedirs(args.resultdir)
+            except OSError, e:
+                if e.errno != errno.EEXIST:
+                    raise
 
         resfile = args.resultdir + '/' + test_suite_name + '.txt'
         if not os.path.isabs(args.resultdir):
@@ -112,7 +118,7 @@ class TestSuiteDriver(object):
         else:
             remote_conn_details = None
 
-        return test_suite_details(test_suite_name, result_log, args.resultdir, args.instance,
+        return test_suite_details(test_suite_name, result_log, args.resultdir, instance,
                            args.namespace, remote_conn_details)
 
     def pre_test_suite_run(self, test_suite_details):
@@ -180,16 +186,21 @@ class TestDriver(object):
         Generic method to connect to VistA. Inteded to be reused by the ATF
         Recorder.
         '''
-        from OSEHRAHelper import ConnectToMUMPS
+        from OSEHRAHelper import ConnectToMUMPS, PROMPT
         VistA = ConnectToMUMPS(logfile=test_suite_details.result_dir + '/' + self.testname + '.txt',
                                instance=test_suite_details.instance, namespace=test_suite_details.namespace,
                                location=test_suite_details.remote_conn_details.remote_address,
                                remote_conn_details=test_suite_details.remote_conn_details)
 
 
-        #TODO: implement special handling for changing namespace here.
-        #all special handling should be placed here, and be driven by 
-        #parameters, such as namespace
+        #TODO: need a proper way to determine whether to wait for the 'namespace>' prompt (ie: call VistA.ZN or not)
+        if test_suite_details.namespace == 'VISTA':
+            try:
+                VistA.ZN('VISTA')
+            except IndexError, no_namechange:
+                pass
+        if test_suite_details.namespace == 'VISTA' or  test_suite_details.instance == 'GTM':
+            VistA.wait(PROMPT)
         return VistA
 
 class test_suite_details(object):

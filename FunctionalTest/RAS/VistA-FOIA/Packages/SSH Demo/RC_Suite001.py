@@ -14,7 +14,6 @@ def dive_into_menus(test_suite_details):
     test_driver = TestHelper.TestDriver(testname)
 
     test_driver.pre_test_run(test_suite_details)
-
     try:
         vista = test_driver.connect_VistA(test_suite_details)
         rc = RCActions(vista, user='01vehu', code='vehu01')
@@ -50,14 +49,11 @@ def dive_into_menus(test_suite_details):
         test_driver.finally_handling(test_suite_details)
     test_driver.end_method_handling(test_suite_details)
 
-
-
 def demo_screen_man(test_suite_details):
     testname = sys._getframe().f_code.co_name
     test_driver = TestHelper.TestDriver(testname)
 
     test_driver.pre_test_run(test_suite_details)
-
     try:
         vista = test_driver.connect_VistA(test_suite_details)
         rc = RCActions(vista, user='1radiologist', code='radiologist1')
@@ -85,4 +81,3 @@ def demo_screen_man(test_suite_details):
     finally:
         test_driver.finally_handling(test_suite_details)
     test_driver.end_method_handling(test_suite_details)
-
