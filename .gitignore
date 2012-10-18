@@ -4,3 +4,6 @@
 #IDE files
 *.project
 *.pydevproject
+
+#Custom
+cmakebin/

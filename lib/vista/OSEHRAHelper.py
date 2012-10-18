@@ -19,12 +19,14 @@ import os
 import telnetlib
 import TestHelper
 import time
-import re
 import logging
+import paramiko
 
 filedir = os.path.dirname(os.path.abspath(__file__))
 pexpectdir = os.path.normpath(os.path.join(filedir, "../pexpect/"))
+paramikoedir = os.path.normpath(os.path.join(filedir, "../"))
 sys.path.append(pexpectdir)
+sys.path.append(paramikoedir)
 try:
   import pexpect
   no_pexpect = None
@@ -133,7 +135,7 @@ class ConnectWinCache(ConnectMUMPS):
     if isinstance(options, list):
       index = self.connection.expect(options)
       if index == -1:
-        logging.debug('ERROR: expected: ' + options)
+        logging.debug('ERROR: expected: ' + str(options))
         raise TestHelper.TestError('ERROR: expected: ' + options)
       self.log.write(index[2])
       return index[0]
@@ -205,7 +207,7 @@ class ConnectLinuxCache(ConnectMUMPS):
     if isinstance(options, list):
       index = self.connection.expect(options)
       if index == -1:
-        logging.debug('ERROR: expected: ' + options)
+        logging.debug('ERROR: expected: ' + str(options))
         raise TestHelper.TestError('ERROR: expected: ' + options)
       self.connection.logfile_read.write(options[index])
       return index
@@ -242,7 +244,7 @@ class ConnectLinuxGTM(ConnectMUMPS):
     if isinstance(options, list):
       index = self.connection.expect(options)
       if index == -1:
-        logging.debug('ERROR: expected: ' + options)
+        logging.debug('ERROR: expected: ' + str(options))
         raise TestHelper.TestError('ERROR: expected: ' + options)
       self.connection.logfile_read.write(options[index])
       return index
@@ -268,11 +270,158 @@ class ConnectLinuxGTM(ConnectMUMPS):
     self.wait('device')
     self.write(path + '/' + filename.replace('.log', '.mcov'))
 
-def ConnectToMUMPS(logfile, instance='CACHE', namespace='VISTA', location='127.0.0.1'):
+class ConnectRemoteSSH(ConnectMUMPS):
+  """
+  This will provide a connection to VistA via SSH. This class handles any
+  remote system (ie: currently there are not multiple versions of it for each
+  remote OS).
+  """
+
+  def __init__(self, logfile, instance, namespace, location, remote_conn_details):
+    super(ConnectMUMPS, self).__init__()
+
+    self.type = str.lower(instance)
+    self.namespace = str.upper(namespace)
+    self.prompt = self.namespace + '>'
+
+    # Create a new SSH client object
+    client = paramiko.SSHClient()
+
+    # Set SSH key parameters to auto accept unknown hosts
+    client.load_system_host_keys()
+    client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+    # Connect to the host
+    client.connect(hostname=remote_conn_details.remote_address, username=remote_conn_details.username, password=remote_conn_details.password)
+
+    # Create a client interaction class which will interact with the host
+    from paramikoe import SSHClientInteraction
+    interact = SSHClientInteraction(client, timeout=10, display=True)
+    self.connection = interact
+    self.connection.logfile_read = file(logfile, 'w')
+    self.client = client #apparently there is a deconstructor which disconnects (probably sends a FYN packet) when client is gone
+
+  def write(self, command):
+    time.sleep(.01)
+    logging.debug('connection.send:' + command)
+    self.connection.send(command + '\r')
+
+  def wait(self, command, tout=15):
+    logging.debug('connection.expect: ' + str(command))
+
+    time.sleep(.01)
+    if command is PROMPT:
+      command = self.namespace + '>'
+    else:
+      command = self.escapeSpecialChars(command)
+      if command == '':
+        command = '.*' #fix for paramiko expect, it does not work with wait('')
+
+    rbuf = self.connection.expect(command, tout)
+    if rbuf == -1:
+        logging.debug('ERROR: expected: ' + command)
+        print 'ERROR: expected: ' + command
+        raise TestHelper.TestError('ERROR: expected: ' + command)
+    else:
+        return 1
+
+  def multiwait(self, options, tout=15):
+    logging.debug('connection.expect: ' + str(options))
+
+    temp_options = []
+    for command in options:
+        temp_options.append(self.escapeSpecialChars(command))
+    options = temp_options
+
+    time.sleep(.01)
+    if isinstance(options, list):
+      index = self.connection.expect(options, timeout=tout)
+      if index == -1:
+        logging.debug('ERROR: expected: ' + str(options))
+        raise TestHelper.TestError('ERROR: expected: ' + str(options))
+      return index
+    else:
+      raise IndexError('Input to multiwait function is not a list')
+
+  def startCoverage(self, routines=['*']):
+    if self.type == 'cache':
+        self.write('D ^%SYS.MONLBL')
+    	rval = self.multiwait(['Stop Monitor', 'Start Monitor'])
+    	if rval == 0:
+        	self.write('1')
+        	self.wait('Start Monitor')
+        	self.write('1')
+    	elif rval == 1:
+        	self.write('1')
+    	else:
+        	raise TestHelper.TestError('ERROR starting monitor, rbuf: ' + rval)
+        for routine in routines:
+            self.wait('Routine Name')
+            self.write(routine)
+        self.wait('Routine Name', tout=60)
+        self.write('')
+        self.wait('choice')
+        self.write('2')
+        self.wait('choice')
+        self.write('1')
+        self.wait('continue')
+        self.write('\r')
+    else:
+        self.write('K ^ZZCOVERAGE VIEW "TRACE":1:"^ZZCOVERAGE"')
+
+  def stopCoverage(self, path):
+    if self.type == 'cache':
+        newpath, filename = os.path.split(path)
+        self.write('D ^%SYS.MONLBL')
+        self.wait('choice')
+        self.write('5')
+        self.wait('summary')
+        self.write('Y')
+        self.wait('FileName')
+        self.write(newpath + '/' + filename.replace('.log', '.cmcov'))
+        self.wait('continue')
+        self.write('')
+        self.wait('choice')
+        self.write('1\r')
+    else:
+        path, filename = os.path.split(path)
+        self.write('VIEW "TRACE":0:"^ZZCOVERAGE"')
+        self.wait(PROMPT)
+        self.write('D ^%GO')
+        self.wait('Global')
+        self.write('ZZCOVERAGE')
+        self.wait('Global')
+        self.write('')
+        self.wait('Label:')
+        self.write('')
+        self.wait('Format')
+        self.write('ZWR')
+        self.wait('device')
+        self.write(path + '/' + filename.replace('.log', '.mcov'))
+
+  """
+  Added to convert regex's into regular string matching. It replaces special
+  characters such as '?' into '\?'
+  """
+  def escapeSpecialChars(self, string):
+    re_chars = '?*.+-|^$\()[]{}'
+    escaped_str = ''
+    for c in string:
+        if c in re_chars:
+            escaped_str = escaped_str + '\\'
+        escaped_str += c
+    return escaped_str
+
+def ConnectToMUMPS(logfile, instance='CACHE', namespace='VISTA', location='127.0.0.1', remote_conn_details=None):
 
     #self.namespace = namespace
     #self.location = location
     #print "You are using " + sys.platform
+    #remote connections
+    if remote_conn_details is not None:
+        return ConnectRemoteSSH(logfile, instance, namespace, location, remote_conn_details)
+
+    #local connections
     if sys.platform == 'win32':
       return ConnectWinCache(logfile, instance, namespace, location)
     elif sys.platform == 'linux2':
