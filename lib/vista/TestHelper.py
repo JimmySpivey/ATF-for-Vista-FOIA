@@ -10,6 +10,7 @@ import os
 import errno
 import datetime
 import getpass
+import ConfigParser
 
 import RemoteConnection
 
@@ -55,18 +56,21 @@ class TestSuiteDriver(object):
     @author: jspivey
     '''
 
-    def __init__(self):
+    def __init__(self, test_file):
         '''
         Constructor
         '''
+        self.test_file = test_file
 
-    def generate_test_suite_details(self, test_suite_name):
+    def generate_test_suite_details(self):
+        test_suite_name = os.path.basename(self.test_file).split('_test.')[0]
+
         usage = "usage: %prog [options] arg"
         parser = argparse.ArgumentParser()
         parser.add_argument('resultdir', help='Result Directory')
-        parser.add_argument('-s', '--remote-server', help='remote server address')
         '''
-        parser.add_argument('-u', '--remote-username', help='remote ssh username') #TODO: should SSH args be required
+        parser.add_argument('-s', '--remote-server', help='remote server address')
+        parser.add_argument('-u', '--remote-username', help='remote ssh username')
         parser.add_argument('-p', '--remote-password', help='remote ssh password')
         '''
         parser.add_argument('-l', '--logging-level', help='Logging level', required=True)
@@ -78,25 +82,42 @@ class TestSuiteDriver(object):
 
         logging_level = LOGGING_LEVELS.get(args.logging_level, logging.NOTSET)
         logging.basicConfig(level=logging_level, filename=args.logging_file, format='%(asctime)s %(levelname)s: %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+        logging.info('RESULT DIR arg: ' + str(args.resultdir))
+        logging.info('LOGGING FILE arg: ' + str(args.logging_file))
+        logging.info('LOGGING LEVEL arg:   ' + str(args.logging_level))
+        logging.info('INSTANCE arg:   ' + str(args.instance))
+        logging.info('NAMESPACE arg:   ' + str(args.namespace))
 
+        config = ConfigParser.RawConfigParser()
 
-
-        if args.remote_server and args.remote_server.__len__() != 1:
-            remote_server = args.remote_server[1:] #remove first char, workaround for ctest
+        read_files = config.read(os.path.join(os.path.dirname(self.test_file), test_suite_name + '.cfg'))
+        if read_files.__len__() != 1:
+            raise IOError
+        if config.getboolean('RemoteDetails', 'RemoteConnect'):
+            remote_server = config.get('RemoteDetails', 'ServerLocation')
             uid = getpass.getpass(prompt="SSH username:") #prints to stderr if stdout isn't present, this causes ctest to fail
             pwd = getpass.getpass(prompt="SSH password:")
+            default_namespace = config.getboolean('RemoteDetails', 'UseDefaultNamespace')
+            instance = config.get('RemoteDetails', 'Instance')
+            if not default_namespace:
+                namespace = config.get('RemoteDetails', 'Namespace')
+            else:
+                namespace = ''
+
+            logging.info('Using REMOTE SERVER from config: ' + str(remote_server))
+            logging.info('Using INSTANCE from config: ' + str(instance))
+            logging.info('Using NAMESPACE from config: ' + str(namespace))
+            remote_conn_details = RemoteConnection.RemoteConnectionDetails(remote_server,
+                uid,
+                pwd,
+                default_namespace)
         else:
-            remote_server = None
-
-        if args.instance == 'TRYCACHE' or args.instance == 'CACHE':
-            instance = 'cache'
-
-        logging.info('RESULT DIR: ' + str(args.resultdir))
-        logging.info('LOGGING FILE: ' + str(args.logging_file))
-        logging.info('LOGGING LEVEL:   ' + str(args.logging_level))
-        logging.info('REMOTE SERVER: ' + remote_server)
-        logging.info('INSTANCE: ' + instance)
-        logging.info('NAMESPACE: ' + str(args.namespace))
+            remote_conn_details = None
+            if args.instance == 'TRYCACHE':
+                instance = 'cache'
+            else:
+                instance = args.instance
+            namespace = args.namespace
 
         if not os.path.isdir(args.resultdir):
             try:
@@ -104,22 +125,14 @@ class TestSuiteDriver(object):
             except OSError, e:
                 if e.errno != errno.EEXIST:
                     raise
-
         resfile = args.resultdir + '/' + test_suite_name + '.txt'
         if not os.path.isabs(args.resultdir):
             logging.error('EXCEPTION: Absolute Path Required for Result Directory')
             raise
         result_log = file(resfile, 'w')
 
-        if remote_server:
-            remote_conn_details = RemoteConnection.RemoteConnectionDetails(remote_server,
-                uid,
-                pwd)
-        else:
-            remote_conn_details = None
-
         return test_suite_details(test_suite_name, result_log, args.resultdir, instance,
-                           args.namespace, remote_conn_details)
+                           namespace, remote_conn_details)
 
     def pre_test_suite_run(self, test_suite_details):
         logging.info('ATF Version: ' + ATF.GIT_TAG)
@@ -192,14 +205,11 @@ class TestDriver(object):
                                location=test_suite_details.remote_conn_details.remote_address,
                                remote_conn_details=test_suite_details.remote_conn_details)
 
-
-        #TODO: need a proper way to determine whether to wait for the 'namespace>' prompt (ie: call VistA.ZN or not)
-        if test_suite_details.namespace == 'VISTA':
+        if not test_suite_details.remote_conn_details or not test_suite_details.remote_conn_details.default_namespace:
             try:
-                VistA.ZN('VISTA')
+                VistA.ZN(VistA.namespace)
             except IndexError, no_namechange:
                 pass
-        if test_suite_details.namespace == 'VISTA' or  test_suite_details.instance == 'GTM':
             VistA.wait(PROMPT)
         return VistA
 

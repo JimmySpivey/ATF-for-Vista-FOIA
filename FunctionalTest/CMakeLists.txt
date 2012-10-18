@@ -28,7 +28,6 @@ if(SIK_SYSTEM_TESTING)
 endif()
 
 if(RAS_SYSTEM_TESTING)
-  set(REM_SERV "" CACHE STRING "SSH server address")
   file(GLOB packages ${CMAKE_CURRENT_SOURCE_DIR}/RAS/VistA-FOIA/Packages/*)
   find_path(TEST_RESULTS_DIR NAMES DOC "Path to results directory")
   foreach(package ${packages})

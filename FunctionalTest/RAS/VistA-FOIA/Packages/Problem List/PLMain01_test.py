@@ -11,9 +11,8 @@ import PL_Suite001
 import TestHelper
 
 def main():
-    test_suite_name = os.path.basename(__file__).split('.')[0]
-    test_suite_driver = TestHelper.TestSuiteDriver()
-    test_suite_details = test_suite_driver.generate_test_suite_details(test_suite_name)
+    test_suite_driver = TestHelper.TestSuiteDriver(__file__)
+    test_suite_details = test_suite_driver.generate_test_suite_details()
 
     try:
         test_suite_driver.pre_test_suite_run(test_suite_details)
