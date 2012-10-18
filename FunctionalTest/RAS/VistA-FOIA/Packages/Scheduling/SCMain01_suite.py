@@ -8,7 +8,7 @@ sys.path = ['./FunctionalTest/RAS/lib'] + ['./dataFiles'] + ['./lib/vista'] + sy
 from SCActions import SCActions
 import TestHelper
 
-def sc_test001(resultlog, result_dir):
+def sc_test001(test_suite_details):
     '''Basic appointment managment options
     Make an Appointment, Check in, Check Out'''
     testname = sys._getframe().f_code.co_name
@@ -31,14 +31,14 @@ def sc_test001(resultlog, result_dir):
         SC.signoff()
         test_driver.post_test_run(test_suite_details)
     except TestHelper.TestError, e:
-        test_driver.exception_handling(e)
+        test_driver.exception_handling(test_suite_details, e)
     else:
         test_driver.try_else_handling(test_suite_details)
     finally:
         test_driver.finally_handling(test_suite_details)
     test_driver.end_method_handling(test_suite_details)
 
-def sc_test002(resultlog, result_dir):
+def sc_test002(test_suite_details):
     '''Basic appointment managment options
     Make an Appointment (Scheduled and Unscheduled),
     record a No-Show, Cancel an appointment and change patients'''
@@ -64,14 +64,14 @@ def sc_test002(resultlog, result_dir):
         SC.signoff()
         test_driver.post_test_run(test_suite_details)
     except TestHelper.TestError, e:
-        test_driver.exception_handling(e)
+        test_driver.exception_handling(test_suite_details, e)
     else:
         test_driver.try_else_handling(test_suite_details)
     finally:
         test_driver.finally_handling(test_suite_details)
     test_driver.end_method_handling(test_suite_details)
 
-def sc_test003(resultlog, result_dir):
+def sc_test003(test_suite_details):
     '''This tests clinic features such as change clinic, change daterange,
      expand the entry, add and edit, and Patient demographics'''
     testname = sys._getframe().f_code.co_name
@@ -90,14 +90,14 @@ def sc_test003(resultlog, result_dir):
         SC.signoff()
         test_driver.post_test_run(test_suite_details)
     except TestHelper.TestError, e:
-        test_driver.exception_handling(e)
+        test_driver.exception_handling(test_suite_details, e)
     else:
         test_driver.try_else_handling(test_suite_details)
     finally:
         test_driver.finally_handling(test_suite_details)
     test_driver.end_method_handling(test_suite_details)
 
-def sc_test004(resultlog, result_dir):
+def sc_test004(test_suite_details):
     '''This tests clinic features such as expand the entry, add and edit, and Patient demographics'''
     testname = sys._getframe().f_code.co_name
     test_driver = TestHelper.TestDriver(testname)
@@ -120,14 +120,14 @@ def sc_test004(resultlog, result_dir):
         SC.signoff()
         test_driver.post_test_run(test_suite_details)
     except TestHelper.TestError, e:
-        test_driver.exception_handling(e)
+        test_driver.exception_handling(test_suite_details, e)
     else:
         test_driver.try_else_handling(test_suite_details)
     finally:
         test_driver.finally_handling(test_suite_details)
     test_driver.end_method_handling(test_suite_details)
 
-def sc_test005(resultlog, result_dir):
+def sc_test005(test_suite_details):
     '''This test checks a patient into a clinic, then discharges him, then deletes his checkout'''
     testname = sys._getframe().f_code.co_name
     test_driver = TestHelper.TestDriver(testname)
@@ -152,14 +152,14 @@ def sc_test005(resultlog, result_dir):
         SC.signoff()
         test_driver.post_test_run(test_suite_details)
     except TestHelper.TestError, e:
-        test_driver.exception_handling(e)
+        test_driver.exception_handling(test_suite_details, e)
     else:
         test_driver.try_else_handling(test_suite_details)
     finally:
         test_driver.finally_handling(test_suite_details)
     test_driver.end_method_handling(test_suite_details)
 
-def sc_test006(resultlog, result_dir):
+def sc_test006(test_suite_details):
     '''This test will exercise the wait list functionality'''
     testname = sys._getframe().f_code.co_name
     test_driver = TestHelper.TestDriver(testname)
@@ -174,14 +174,14 @@ def sc_test006(resultlog, result_dir):
         SC.signoff()
         test_driver.post_test_run(test_suite_details)
     except TestHelper.TestError, e:
-        test_driver.exception_handling(e)
+        test_driver.exception_handling(test_suite_details, e)
     else:
         test_driver.try_else_handling(test_suite_details)
     finally:
         test_driver.finally_handling(test_suite_details)
     test_driver.end_method_handling(test_suite_details)
 
-def startmon(resultlog, result_dir):
+def startmon(test_suite_details):
     '''Starts Coverage Monitor'''
     testname = sys._getframe().f_code.co_name
     test_driver = TestHelper.TestDriver(testname)
@@ -197,14 +197,14 @@ def startmon(resultlog, result_dir):
         VistA1.write('^\r^\r^\r')
         VistA1.write('h\r')
     except TestHelper.TestError, e:
-        test_driver.exception_handling(e)
+        test_driver.exception_handling(test_suite_details, e)
     else:
         test_driver.try_else_handling(test_suite_details)
     finally:
         test_driver.finally_handling(test_suite_details)
     test_driver.end_method_handling(test_suite_details)
 
-def stopmon (resultlog, result_dir):
+def stopmon (test_suite_details):
     ''' STOP MONITOR'''
     testname = sys._getframe().f_code.co_name
     test_driver = TestHelper.TestDriver(testname)
@@ -213,7 +213,7 @@ def stopmon (resultlog, result_dir):
     try:
         # Connect to VistA
         VistA1 = test_driver.connect_VistA(test_suite_details)
-        VistA1.stopCoverage(path=(result_dir + '/' + 'Scheduling_coverage.txt'))
+        VistA1.stopCoverage(path=(test_suite_details.result_dir + '/' + 'Scheduling_coverage.txt'))
         test_driver.post_test_run(test_suite_details)
         '''
         Close Vista
@@ -221,7 +221,7 @@ def stopmon (resultlog, result_dir):
         VistA1.write('^\r^\r^\r')
         VistA1.write('h\r')
     except TestHelper.TestError, e:
-        test_driver.exception_handling(e)
+        test_driver.exception_handling(test_suite_details, e)
     else:
         test_driver.try_else_handling(test_suite_details)
     finally:

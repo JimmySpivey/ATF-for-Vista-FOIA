@@ -199,10 +199,14 @@ class TestDriver(object):
         Generic method to connect to VistA. Inteded to be reused by the ATF
         Recorder.
         '''
+        if test_suite_details.remote_conn_details:
+            location = test_suite_details.remote_conn_details.remote_address
+        else:
+            location = '127.0.0.1'
         from OSEHRAHelper import ConnectToMUMPS, PROMPT
         VistA = ConnectToMUMPS(logfile=test_suite_details.result_dir + '/' + self.testname + '.txt',
                                instance=test_suite_details.instance, namespace=test_suite_details.namespace,
-                               location=test_suite_details.remote_conn_details.remote_address,
+                               location=location,
                                remote_conn_details=test_suite_details.remote_conn_details)
 
         if not test_suite_details.remote_conn_details or not test_suite_details.remote_conn_details.default_namespace:

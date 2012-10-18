@@ -39,7 +39,7 @@ def pl_test001(test_suite_details):
         pl.signoff()
         test_driver.post_test_run(test_suite_details)
     except TestHelper.TestError, e:
-        test_driver.exception_handling(e)
+        test_driver.exception_handling(test_suite_details, e)
     else:
         test_driver.try_else_handling(test_suite_details)
     finally:
@@ -79,7 +79,7 @@ def pl_test002(test_suite_details):
         pl.signoff()
         test_driver.post_test_run(test_suite_details)
     except TestHelper.TestError, e:
-        test_driver.exception_handling(e)
+        test_driver.exception_handling(test_suite_details, e)
     else:
         test_driver.try_else_handling(test_suite_details)
     finally:
@@ -120,7 +120,7 @@ def pl_test003(test_suite_details):
         pl.signoff()
         test_driver.post_test_run(test_suite_details)
     except TestHelper.TestError, e:
-        test_driver.exception_handling(e)
+        test_driver.exception_handling(test_suite_details, e)
     else:
         test_driver.try_else_handling(test_suite_details)
     finally:
@@ -167,7 +167,7 @@ def pl_test004(test_suite_details):
         pl.signoff()
         test_driver.post_test_run(test_suite_details)
     except TestHelper.TestError, e:
-        test_driver.exception_handling(e)
+        test_driver.exception_handling(test_suite_details, e)
     else:
         test_driver.try_else_handling(test_suite_details)
     finally:
@@ -224,7 +224,7 @@ def pl_test005(test_suite_details):
         pl1.signoff()
         test_driver.post_test_run(test_suite_details)
     except TestHelper.TestError, e:
-        test_driver.exception_handling(e)
+        test_driver.exception_handling(test_suite_details, e)
     else:
         test_driver.try_else_handling(test_suite_details)
     finally:
@@ -258,7 +258,7 @@ def pl_test006 (test_suite_details):
         pl.signoff()
         test_driver.post_test_run(test_suite_details)
     except TestHelper.TestError, e:
-        test_driver.exception_handling(e)
+        test_driver.exception_handling(test_suite_details, e)
     else:
         test_driver.try_else_handling(test_suite_details)
     finally:
@@ -287,7 +287,7 @@ def pl_test007 (test_suite_details):
         pl.signoff()
         test_driver.post_test_run(test_suite_details)
     except TestHelper.TestError, e:
-        test_driver.exception_handling(e)
+        test_driver.exception_handling(test_suite_details, e)
     else:
         test_driver.try_else_handling(test_suite_details)
     finally:
@@ -321,7 +321,7 @@ def pl_test008 (test_suite_details):
         pl2.signoff()
         test_driver.post_test_run(test_suite_details)
     except TestHelper.TestError, e:
-        test_driver.exception_handling(e)
+        test_driver.exception_handling(test_suite_details, e)
     else:
         test_driver.try_else_handling(test_suite_details)
     finally:
@@ -365,7 +365,7 @@ def pl_test009 (test_suite_details):
         pl.signoff()
         test_driver.post_test_run(test_suite_details)
     except TestHelper.TestError, e:
-        test_driver.exception_handling(e)
+        test_driver.exception_handling(test_suite_details, e)
     else:
         test_driver.try_else_handling(test_suite_details)
     finally:
@@ -390,7 +390,7 @@ def pl_test010(test_suite_details):
         pl.signoff()
         test_driver.post_test_run(test_suite_details)
     except TestHelper.TestError, e:
-        test_driver.exception_handling(e)
+        test_driver.exception_handling(test_suite_details, e)
     else:
         test_driver.try_else_handling(test_suite_details)
     finally:
@@ -416,7 +416,7 @@ def pl_test011(test_suite_details):
         pl.signoff()
         test_driver.post_test_run(test_suite_details)
     except TestHelper.TestError, e:
-        test_driver.exception_handling(e)
+        test_driver.exception_handling(test_suite_details, e)
     else:
         test_driver.try_else_handling(test_suite_details)
     finally:
@@ -472,7 +472,7 @@ def pl_test012(test_suite_details):
         p5.signoff()
         test_driver.post_test_run(test_suite_details)
     except TestHelper.TestError, e:
-        test_driver.exception_handling(e)
+        test_driver.exception_handling(test_suite_details, e)
     else:
         test_driver.try_else_handling(test_suite_details)
     finally:
@@ -514,7 +514,7 @@ def pl_test013(test_suite_details):
         pl.signoff()
         test_driver.post_test_run(test_suite_details)
     except TestHelper.TestError, e:
-        test_driver.exception_handling(e)
+        test_driver.exception_handling(test_suite_details, e)
     else:
         test_driver.try_else_handling(test_suite_details)
     finally:
@@ -537,7 +537,7 @@ def startmon(test_suite_details):
         VistA1.write('h\r')
         test_driver.post_test_run(test_suite_details)
     except TestHelper.TestError, e:
-        test_driver.exception_handling(e)
+        test_driver.exception_handling(test_suite_details, e)
     else:
         test_driver.try_else_handling(test_suite_details)
     finally:
@@ -553,7 +553,7 @@ def stopmon (test_suite_details):
     try:
         # Connect to VistA
         VistA1 = test_driver.connect_VistA(test_suite_details)
-        VistA1.stopCoverage(path=(result_dir + '/' + 'ProblemList_coverage.txt')) #TODO: move out of OSEHRA helper?
+        VistA1.stopCoverage(path=(test_suite_details.result_dir + '/' + 'ProblemList_coverage.txt')) #TODO: move out of OSEHRA helper?
         '''
         Close Vista
         '''
@@ -561,7 +561,7 @@ def stopmon (test_suite_details):
         VistA1.write('h\r')
         test_driver.post_test_run(test_suite_details)
     except TestHelper.TestError, e:
-        test_driver.exception_handling(e)
+        test_driver.exception_handling(test_suite_details, e)
     else:
         test_driver.try_else_handling(test_suite_details)
     finally:

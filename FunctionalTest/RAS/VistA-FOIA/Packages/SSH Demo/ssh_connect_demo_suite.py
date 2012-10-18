@@ -42,7 +42,7 @@ def dive_into_menus(test_suite_details):
 
         test_driver.post_test_run(test_suite_details)
     except TestHelper.TestError, e:
-        test_driver.exception_handling(e)
+        test_driver.exception_handling(test_suite_details, e)
     else:
         test_driver.try_else_handling(test_suite_details)
     finally:
@@ -75,7 +75,7 @@ def demo_screen_man(test_suite_details):
 
         test_driver.post_test_run(test_suite_details)
     except TestHelper.TestError, e:
-        test_driver.exception_handling(e)
+        test_driver.exception_handling(test_suite_details, e)
     else:
         test_driver.try_else_handling(test_suite_details)
     finally:
