@@ -151,9 +151,9 @@ class TestSuiteDriver(object):
         logging.error('*******exception*******' + str(e))
 
     def try_else_handling(self, test_suite_details):
-        test_suite_details.result_log.write(
-            'All tests in test suite \'' + test_suite_details.test_suite_name + '\'' +
-            ' completed without exception.\n')
+        outstr = 'All tests in test suite \'' + test_suite_details.test_suite_name + '\'' + ' completed without exception.'
+        logging.info(outstr)
+        test_suite_details.result_log.write(outstr + '\n')
 
     def finally_handling(self, test_suite_details):
         test_suite_details.result_log.write('finished')
@@ -190,7 +190,9 @@ class TestDriver(object):
         logging.error(self.testname + ' EXCEPTION ERROR: Unexpected test result')
 
     def try_else_handling(self, test_suite_details):
-        test_suite_details.result_log.write('Pass\n')
+        outstr = 'Test ' + self.testname + ' Passed'
+        logging.debug(outstr)
+        test_suite_details.result_log.write(outstr + '\n')
 
     def finally_handling(self, test_suite_details):
         pass
