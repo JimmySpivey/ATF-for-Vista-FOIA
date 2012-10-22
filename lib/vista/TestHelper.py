@@ -95,8 +95,12 @@ class TestSuiteDriver(object):
             raise IOError
         if config.getboolean('RemoteDetails', 'RemoteConnect'):
             remote_server = config.get('RemoteDetails', 'ServerLocation')
+            '''
             uid = getpass.getpass(prompt="SSH username:") #prints to stderr if stdout isn't present, this causes ctest to fail
             pwd = getpass.getpass(prompt="SSH password:")
+            '''
+            uid = config.get('RemoteDetails', 'SSHUsername')
+            pwd = config.get('RemoteDetails', 'SSHPassword')
             default_namespace = config.getboolean('RemoteDetails', 'UseDefaultNamespace')
             instance = config.get('RemoteDetails', 'Instance')
             if not default_namespace:
