@@ -1,4 +1,4 @@
-execute_process(COMMAND "@PYTHON_EXECUTABLE@" "@rastest@" "@TEST_RESULTS_DIR@" -l info -i -f "@INSTANCE@" -n "@NAMESPACE@" WORKING_DIRECTORY "@VISTA_SOURCE_DIR@" ERROR_VARIABLE FunctionalError)
+execute_process(COMMAND "@PYTHON_EXECUTABLE@" "@rastest@" "@TEST_RESULTS_DIR@" -l info -f "@TEST_RESULTS_DIR@-loggerOut.txt" WORKING_DIRECTORY "@VISTA_SOURCE_DIR@" ERROR_VARIABLE FunctionalError)
 if(FunctionalError)
   message(FATAL_ERROR "${FunctionalError}")
 endif()
