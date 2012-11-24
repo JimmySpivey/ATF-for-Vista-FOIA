@@ -296,7 +296,7 @@ class ConnectRemoteSSH(ConnectMUMPS):
 
     # Create a client interaction class which will interact with the host
     from paramikoe import SSHClientInteraction
-    interact = SSHClientInteraction(client, timeout=10, display=True)
+    interact = SSHClientInteraction(client, timeout=10, display=False)
     self.connection = interact
     self.connection.logfile_read = file(logfile, 'w')
     self.client = client #apparently there is a deconstructor which disconnects (probably sends a FYN packet) when client is gone
