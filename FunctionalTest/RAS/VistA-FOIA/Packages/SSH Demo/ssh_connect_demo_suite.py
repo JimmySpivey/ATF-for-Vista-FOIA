@@ -16,7 +16,9 @@ def dive_into_menus(test_suite_details):
     test_driver.pre_test_run(test_suite_details)
     try:
         vista = test_driver.connect_VistA(test_suite_details)
-        rc = RCActions(vista, user='01vehu', code='vehu01')
+        rc = RCActions(vista, user='01vehu', code='vehu01') #TODO: change to a/v code lookup
+        #TestHelper.fetch_access_code(test_suite_details.test_suite_name)
+        #vista.write(TestHelper.fetch_verify_code(test_suite_details.test_suite_name))
         rc.signon()
         vista.wait('Select Training Menu Option:')
         vista.write('OE')
@@ -56,7 +58,7 @@ def demo_screen_man(test_suite_details):
     test_driver.pre_test_run(test_suite_details)
     try:
         vista = test_driver.connect_VistA(test_suite_details)
-        rc = RCActions(vista, user='1radiologist', code='radiologist1')
+        rc = RCActions(vista, user='1radiologist', code='radiologist1') #TODO: when moving to the config approach, new a/v codes should be put into a new test suite?
         rc.signon()
         vista.wait('Select TERMINAL TYPE NAME:')
         vista.write('')
@@ -81,3 +83,4 @@ def demo_screen_man(test_suite_details):
     finally:
         test_driver.finally_handling(test_suite_details)
     test_driver.end_method_handling(test_suite_details)
+

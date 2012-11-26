@@ -241,6 +241,37 @@ class test_suite_details(object):
         self.instance = instance
         self.namespace = namespace
         self.remote_conn_details = remote_conn_details
+        
+
+def read_suite_config_file():
+    #move to a module for parsing cfg values
+    config = ConfigParser.RawConfigParser() 
+    from os.path import expanduser
+    read_files = config.read(expanduser("~/.ATF/roles.cfg"))
+    if read_files.__len__() != 1:
+        raise IOError
+    return config
+    #move to a module for parsing cfg values
+        
+def fetch_access_code(test_suite_name):
+    config = read_suite_config_file()
+    return config.get(test_suite_name, 'aCode')
+    
+    
+    '''
+    from os.path import expanduser
+    in_test_suite = False
+    for line in  open(expanduser("~/.ATF/roles.cfg"), 'r'):
+        line = line.strip()
+        in_test_suite = line == test_suite_name or in_test_suite
+        if line.startswith('aCode') and in_test_suite:
+            return line[line.strip().rfind("="):].strip()
+    '''
+        
+def fetch_verify_code(test_suite_name):
+    config = read_suite_config_file()
+    return config.get(test_suite_name, 'vCode')
+    
 
 #TODO: consider moving these classes/refactoring modules in general at some point
 class ATF(object):
