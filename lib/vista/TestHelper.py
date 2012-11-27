@@ -88,8 +88,10 @@ class TestSuiteDriver(object):
         logging.info('INSTANCE arg:   ' + str(args.instance))
         logging.info('NAMESPACE arg:   ' + str(args.namespace))
 
+        package_name = self.test_file[self.test_file.rfind('Packages')+9:self.test_file.rfind(test_suite_name)-1]
+        
+        #TODO: move config parsing setup out of here
         config = ConfigParser.RawConfigParser()
-
         read_files = config.read(os.path.join(os.path.dirname(self.test_file), test_suite_name + '.cfg'))
         if read_files.__len__() != 1:
             raise IOError
@@ -99,8 +101,18 @@ class TestSuiteDriver(object):
             uid = getpass.getpass(prompt="SSH username:") #prints to stderr if stdout isn't present, this causes ctest to fail
             pwd = getpass.getpass(prompt="SSH password:")
             '''
+            '''
             uid = config.get('RemoteDetails', 'SSHUsername')
             pwd = config.get('RemoteDetails', 'SSHPassword')
+            '''
+            #get ssh username/password from local user's config file
+            
+            
+            userConfig = read_suite_config_file()
+            uid = userConfig.get(package_name+'-'+test_suite_name, 'SSHUsername')
+            pwd = userConfig.get(package_name+'-'+test_suite_name, 'SSHPassword')
+            #
+            
             default_namespace = config.getboolean('RemoteDetails', 'UseDefaultNamespace')
             instance = config.get('RemoteDetails', 'Instance')
             if not default_namespace:
@@ -135,7 +147,7 @@ class TestSuiteDriver(object):
             raise
         result_log = file(resfile, 'w')
 
-        return test_suite_details(test_suite_name, result_log, args.resultdir, instance,
+        return test_suite_details(package_name, test_suite_name, result_log, args.resultdir, instance,
                            namespace, remote_conn_details)
 
     def pre_test_suite_run(self, test_suite_details):
@@ -230,11 +242,12 @@ class test_suite_details(object):
     existing tests).
     '''
 
-    def __init__(self, test_suite_name, result_log, result_dir, instance,
+    def __init__(self, package_name, test_suite_name, result_log, result_dir, instance,
                  namespace, remote_conn_details):
         '''
         Constructor
         '''
+        self.package_name = package_name
         self.test_suite_name = test_suite_name
         self.result_log = result_log
         self.result_dir = result_dir
@@ -253,9 +266,9 @@ def read_suite_config_file():
     return config
     #move to a module for parsing cfg values
         
-def fetch_access_code(test_suite_name, testname):
+def fetch_access_code(test_suite_details, testname):
     config = read_suite_config_file()
-    return config.get(test_suite_name+'-'+testname, 'aCode')
+    return config.get(test_suite_details.package_name+'-'+test_suite_details.test_suite_name, testname+'_aCode')
     
     
     '''
@@ -268,10 +281,9 @@ def fetch_access_code(test_suite_name, testname):
             return line[line.strip().rfind("="):].strip()
     '''
         
-def fetch_verify_code(test_suite_name, testname):
+def fetch_verify_code(test_suite_details, testname):
     config = read_suite_config_file()
-    return config.get(test_suite_name+'-'+testname, 'vCode')
-    
+    return config.get(test_suite_details.package_name+'-'+test_suite_details.test_suite_name, testname+'_vCode')    
 
 #TODO: consider moving these classes/refactoring modules in general at some point
 class ATF(object):
