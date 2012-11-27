@@ -4,7 +4,6 @@ Created on Sep 28, 2012
 @author: jspivey
 '''
 import time
-import TestHelper
 from Actions import Actions
 import logging
 

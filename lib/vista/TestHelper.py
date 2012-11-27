@@ -253,9 +253,9 @@ def read_suite_config_file():
     return config
     #move to a module for parsing cfg values
         
-def fetch_access_code(test_suite_name):
+def fetch_access_code(test_suite_name, testname):
     config = read_suite_config_file()
-    return config.get(test_suite_name, 'aCode')
+    return config.get(test_suite_name+'-'+testname, 'aCode')
     
     
     '''
@@ -268,9 +268,9 @@ def fetch_access_code(test_suite_name):
             return line[line.strip().rfind("="):].strip()
     '''
         
-def fetch_verify_code(test_suite_name):
+def fetch_verify_code(test_suite_name, testname):
     config = read_suite_config_file()
-    return config.get(test_suite_name, 'vCode')
+    return config.get(test_suite_name+'-'+testname, 'vCode')
     
 
 #TODO: consider moving these classes/refactoring modules in general at some point

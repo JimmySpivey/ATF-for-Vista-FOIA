@@ -16,9 +16,9 @@ def dive_into_menus(test_suite_details):
     test_driver.pre_test_run(test_suite_details)
     try:
         vista = test_driver.connect_VistA(test_suite_details)
-        rc = RCActions(vista, user='01vehu', code='vehu01') #TODO: change to a/v code lookup
-        #TestHelper.fetch_access_code(test_suite_details.test_suite_name)
-        #vista.write(TestHelper.fetch_verify_code(test_suite_details.test_suite_name))
+        rc = RCActions(vista,
+                       user=TestHelper.fetch_access_code(test_suite_details.test_suite_name,testname),
+                       code=TestHelper.fetch_verify_code(test_suite_details.test_suite_name, testname))
         rc.signon()
         vista.wait('Select Training Menu Option:')
         vista.write('OE')
