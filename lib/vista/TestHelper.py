@@ -212,7 +212,7 @@ class TestDriver(object):
     def end_method_handling(self, test_suite_details):
         pass
 
-    def connect_VistA(self, test_suite_details):
+    def connect_VistA(self, test_suite_details, testname):
         '''
         Generic method to connect to VistA. Inteded to be reused by the ATF
         Recorder.
@@ -233,6 +233,12 @@ class TestDriver(object):
             except IndexError, no_namechange:
                 pass
             VistA.wait(PROMPT)
+            
+        VistA.wait('ACCESS CODE:')
+        VistA.write(fetch_access_code(test_suite_details, testname))
+        VistA.wait('VERIFY CODE:')
+        VistA.write(fetch_verify_code(test_suite_details, testname))
+            
         return VistA
 
 class test_suite_details(object):
